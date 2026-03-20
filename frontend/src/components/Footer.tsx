@@ -6,21 +6,18 @@ import { Github, Twitter, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
 const footerLinks = {
   platform: [
     { label: 'Marketplace', href: '/marketplace' },
-    { label: 'For Farmers', href: '/farmer' },
-    { label: 'For Buyers', href: '/buyer' },
-    { label: 'Pricing', href: '/pricing' },
+    { label: 'For Farmers', href: '/auth/register?role=farmer' },
+    { label: 'For Buyers', href: '/auth/register?role=buyer' },
   ],
   company: [
     { label: 'About Us', href: '/about' },
-    { label: 'Careers', href: '/careers' },
     { label: 'Blog', href: '/blog' },
-    { label: 'Press', href: '/press' },
+    { label: 'Careers', href: '/careers' },
   ],
   resources: [
-    { label: 'Documentation', href: '/docs' },
-    { label: 'API Reference', href: '/api-docs' },
     { label: 'Help Center', href: '/help' },
     { label: 'Contact', href: '/contact' },
+    { label: 'API Docs', href: '/api-docs' },
   ],
   legal: [
     { label: 'Privacy Policy', href: '/privacy' },
@@ -39,34 +36,34 @@ const socialLinks = [
 export default function Footer() {
   return (
     <footer className="bg-gray-900 text-gray-400">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
           {/* Brand */}
           <div className="col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-                <span className="text-white font-bold text-xl">O</span>
+            <Link href="/" className="flex items-center gap-2 mb-4 group">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md">
+                <span className="text-white font-bold text-lg">O</span>
               </div>
-              <span className="text-xl font-display font-bold text-white">
-                ODOP<span className="text-primary-500">Connect</span>
+              <span className="text-lg font-display font-bold text-white">
+                ODOP<span className="text-emerald-500">Connect</span>
               </span>
             </Link>
-            <p className="mb-6 text-sm">
+            <p className="mb-6 text-sm leading-relaxed text-gray-500">
               AI-powered agricultural marketplace connecting farmers directly
               with businesses. Eliminate middlemen, ensure traceability, and
               trade smarter.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-2.5">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center hover:bg-primary-600 transition-colors"
+                  className="w-9 h-9 rounded-lg bg-gray-800 flex items-center justify-center hover:bg-emerald-600 transition-colors"
                   aria-label={social.label}
                 >
-                  <social.icon className="w-5 h-5" />
+                  <social.icon className="w-4 h-4" />
                 </a>
               ))}
             </div>
@@ -74,13 +71,13 @@ export default function Footer() {
 
           {/* Platform */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Platform</h3>
-            <ul className="space-y-2">
+            <h3 className="text-white font-semibold text-sm mb-4">Platform</h3>
+            <ul className="space-y-2.5">
               {footerLinks.platform.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm hover:text-primary-400 transition-colors"
+                    className="text-sm text-gray-500 hover:text-emerald-400 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -91,13 +88,13 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Company</h3>
-            <ul className="space-y-2">
+            <h3 className="text-white font-semibold text-sm mb-4">Company</h3>
+            <ul className="space-y-2.5">
               {footerLinks.company.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm hover:text-primary-400 transition-colors"
+                    className="text-sm text-gray-500 hover:text-emerald-400 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -108,13 +105,13 @@ export default function Footer() {
 
           {/* Resources */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Resources</h3>
-            <ul className="space-y-2">
+            <h3 className="text-white font-semibold text-sm mb-4">Resources</h3>
+            <ul className="space-y-2.5">
               {footerLinks.resources.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm hover:text-primary-400 transition-colors"
+                    className="text-sm text-gray-500 hover:text-emerald-400 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -125,13 +122,13 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="text-white font-semibold mb-4">Legal</h3>
-            <ul className="space-y-2">
+            <h3 className="text-white font-semibold text-sm mb-4">Legal</h3>
+            <ul className="space-y-2.5">
               {footerLinks.legal.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-sm hover:text-primary-400 transition-colors"
+                    className="text-sm text-gray-500 hover:text-emerald-400 transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -142,25 +139,25 @@ export default function Footer() {
         </div>
 
         {/* Contact Info */}
-        <div className="mt-12 pt-8 border-t border-gray-800">
-          <div className="flex flex-wrap gap-8 text-sm">
+        <div className="mt-10 pt-8 border-t border-gray-800">
+          <div className="flex flex-wrap gap-6 text-sm text-gray-500">
             <div className="flex items-center gap-2">
-              <Mail className="w-4 h-4" />
+              <Mail className="w-4 h-4 text-gray-600" />
               <span>hello@odopconnect.com</span>
             </div>
             <div className="flex items-center gap-2">
-              <Phone className="w-4 h-4" />
-              <span>+1 (555) 123-4567</span>
+              <Phone className="w-4 h-4 text-gray-600" />
+              <span>+91 98765 43210</span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
-              <span>San Francisco, CA</span>
+              <MapPin className="w-4 h-4 text-gray-600" />
+              <span>Mumbai, India</span>
             </div>
           </div>
         </div>
 
         {/* Copyright */}
-        <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
+        <div className="mt-6 pt-6 border-t border-gray-800/50 text-center text-sm text-gray-600">
           <p>&copy; {new Date().getFullYear()} ODOP Connect. All rights reserved.</p>
         </div>
       </div>
