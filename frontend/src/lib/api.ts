@@ -165,6 +165,23 @@ export const aiApi = {
   getBuyerRecommendations: (payload: any) => api.post('/ai/buyer-recommendation', payload),
   getQualityGrade: (productId: string) => api.get(`/ai/quality-grade/${productId}`),
   getDemandForecast: (productCategory: string) => api.get(`/ai/demand-forecast/${productCategory}`),
+  
+  // Strategic Analytics
+  getRevenueMetrics: (farmerId: string) => api.get(`/ai/analytics/revenue/${farmerId}`),
+  getProfitability: (farmerId: string) => api.get(`/ai/analytics/profitability/${farmerId}`),
+  getRevenueForecast: (farmerId: string) => api.get(`/ai/analytics/revenue-forecast/${farmerId}`),
+  getBuyerSentiment: (farmerId: string) => api.get(`/ai/analytics/buyer-sentiment/${farmerId}`),
+  getTenderInsights: (farmerId: string) => api.get(`/ai/analytics/tender-insights/${farmerId}`),
+  getFulfillmentHealth: (farmerId: string) => api.get(`/ai/analytics/fulfillment-health/${farmerId}`),
+  getInventoryIntelligence: (farmerId: string) => api.get(`/ai/analytics/inventory-intelligence/${farmerId}`),
+  getLogisticsEfficiency: (farmerId: string) => api.get(`/ai/analytics/logistics-efficiency/${farmerId}`),
+  getGrowthIndex: (farmerId: string) => api.get(`/ai/analytics/growth-index/${farmerId}`),
+  getMarketBenchmarking: (farmerId: string) => api.get(`/ai/analytics/market-benchmarking/${farmerId}`),
+  getExpansionOpportunities: (farmerId: string) => api.get(`/ai/analytics/expansion-opportunities/${farmerId}`),
+  getRiskProfile: (farmerId: string) => api.get(`/ai/analytics/risk-profile/${farmerId}`),
+  getComplianceStatus: (farmerId: string) => api.get(`/ai/analytics/compliance-checker/${farmerId}`),
+  getDigitalFootprint: (farmerId: string) => api.get(`/ai/analytics/digital-footprint/${farmerId}`),
+  getSustainabilityScore: (farmerId: string) => api.get(`/ai/analytics/sustainability-score/${farmerId}`),
 };
 
 // Blockchain API

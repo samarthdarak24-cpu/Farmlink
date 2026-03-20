@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { 
   BarChart3, Package, ShoppingBag, Truck, FileText, Handshake, 
   ShieldCheck, Star, Users, ArrowUpRight, ArrowDownRight, 
-  Zap, Calendar, MapPin, Search, RefreshCw, Send, Activity, Settings
+  Zap, Calendar, MapPin, Search, RefreshCw, Send, Activity, Settings, BrainCircuit
 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuthZustand } from '@/store/authZustand';
@@ -77,10 +77,10 @@ export default function FarmerOverviewPage() {
         className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
       >
         {[
-          { label: 'Live Orders', val: stats.activeOrders, href: '/dashboard/orders', icon: ShoppingBag, color: 'from-blue-600 to-indigo-600 shadow-blue-500/20' },
-          { label: 'Managed Stock', val: stats.inventoryCount, href: '/dashboard/inventory', icon: Package, color: 'from-emerald-600 to-teal-600 shadow-emerald-500/20' },
-          { label: 'Unfilled RFQs', val: stats.openRfqs, href: '/dashboard/rfq', icon: FileText, color: 'from-amber-500 to-orange-600 shadow-amber-500/20' },
-          { label: 'Waitlist Grade', val: '4.8', href: '/dashboard/reviews', icon: Star, color: 'from-purple-600 to-violet-600 shadow-purple-500/20' },
+          { label: 'Live Orders', val: stats.activeOrders, href: '/dashboard/farmer/orders', icon: ShoppingBag, color: 'from-blue-600 to-indigo-600 shadow-blue-500/20' },
+          { label: 'Managed Stock', val: stats.inventoryCount, href: '/dashboard/farmer/inventory', icon: Package, color: 'from-emerald-600 to-teal-600 shadow-emerald-500/20' },
+          { label: 'Strategic Analytics', val: '15 Insights', href: '/dashboard/farmer/analytics', icon: BrainCircuit, color: 'from-fuchsia-600 to-pink-600 shadow-fuchsia-500/20' },
+          { label: 'Waitlist Grade', val: '4.8', href: '/dashboard/farmer/reviews', icon: Star, color: 'from-purple-600 to-violet-600 shadow-purple-500/20' },
         ].map((nav, i) => (
           <Link key={nav.label} href={nav.href}>
             <motion.div 

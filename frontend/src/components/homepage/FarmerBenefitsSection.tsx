@@ -7,9 +7,7 @@ import {
   Users,
   Zap,
   BarChart3,
-  Leaf,
   MapPin,
-  Clock,
 } from 'lucide-react';
 import Container from './Container';
 import SectionHeading from './SectionHeading';
@@ -19,45 +17,45 @@ const benefits = [
     icon: TrendingUp,
     title: 'Better Prices',
     description: 'Get 30-40% better prices by eliminating middlemen. Sell directly to verified buyers at competitive rates.',
-    color: 'from-emerald-500 to-green-600',
+    color: 'from-emerald-500 to-teal-600',
   },
   {
     icon: Users,
     title: 'Verified Buyers',
     description: 'Access verified, vetted buyers across industries. Build long-term relationships with trusted partners.',
-    color: 'from-blue-500 to-cyan-600',
+    color: 'from-teal-500 to-cyan-600',
   },
   {
     icon: ShieldCheck,
     title: 'Secure Transactions',
     description: 'All transactions are protected. Secure payment gateways and dispute resolution support included.',
-    color: 'from-purple-500 to-indigo-600',
+    color: 'from-cyan-500 to-blue-600',
   },
   {
     icon: Zap,
     title: 'Real-time Chat',
     description: 'Communicate directly with buyers. Live negotiations, instant confirmations, and order tracking.',
-    color: 'from-orange-500 to-red-600',
+    color: 'from-amber-500 to-orange-600',
   },
   {
     icon: BarChart3,
     title: 'Analytics Dashboard',
     description: 'Track your sales, trends, and performance. Data-driven insights for better decision making.',
-    color: 'from-pink-500 to-rose-600',
+    color: 'from-violet-500 to-purple-600',
   },
   {
     icon: MapPin,
     title: 'Wide Market Reach',
     description: 'Expand beyond your local market. Connect with buyers nationwide and internationally.',
-    color: 'from-teal-500 to-blue-600',
+    color: 'from-green-500 to-emerald-600',
   },
 ];
 
 export default function FarmerBenefitsSection() {
   return (
-    <section className="relative py-24 lg:py-32 overflow-hidden bg-gray-950">
+    <section className="relative section-padding overflow-hidden bg-gray-950">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-b from-primary-500/5 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 via-transparent to-transparent pointer-events-none" />
 
       <Container>
         <div className="relative z-10">
@@ -67,16 +65,16 @@ export default function FarmerBenefitsSection() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="mb-20 text-center"
+            className="mb-16 text-center"
           >
             <SectionHeading title="Why Farmers Choose ODOP Connect" />
-            <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto">
+            <p className="mt-5 text-base sm:text-lg text-gray-400 max-w-2xl mx-auto leading-relaxed">
               Empowering farmers with tools, connections, and opportunities to grow their business and maximize profits.
             </p>
           </motion.div>
 
           {/* Benefits Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map((benefit, index) => {
               const Icon = benefit.icon;
               return (
@@ -84,33 +82,30 @@ export default function FarmerBenefitsSection() {
                   key={index}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  transition={{ duration: 0.6, delay: index * 0.08 }}
                   viewport={{ once: true }}
                   className="group relative"
                 >
-                  {/* Card background */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-white/[0.02] rounded-2xl border border-white/10 group-hover:border-white/20 transition-all duration-500 opacity-0 group-hover:opacity-100" />
-
                   {/* Content */}
-                  <div className="relative p-8 h-full flex flex-col rounded-2xl border border-white/[0.05] group-hover:border-white/10 transition-all duration-500 bg-gradient-to-br from-white/[0.02] via-transparent to-transparent hover:from-white/[0.05] hover:via-white/[0.02] hover:to-transparent">
+                  <div className="relative p-8 h-full flex flex-col rounded-2xl border border-white/[0.06] group-hover:border-white/15 transition-all duration-500 bg-gradient-to-br from-white/[0.02] via-transparent to-transparent hover:from-white/[0.05] hover:via-white/[0.02]">
                     {/* Icon background glow */}
                     <div
-                      className={`absolute -top-6 -right-6 w-24 h-24 rounded-full bg-gradient-to-br ${benefit.color} opacity-0 group-hover:opacity-20 blur-2xl transition-opacity duration-500`}
+                      className={`absolute -top-6 -right-6 w-24 h-24 rounded-full bg-gradient-to-br ${benefit.color} opacity-0 group-hover:opacity-15 blur-2xl transition-opacity duration-500`}
                     />
 
                     {/* Icon */}
-                    <div className="relative mb-6">
+                    <div className="relative mb-5">
                       <div
-                        className={`w-14 h-14 rounded-xl bg-gradient-to-br ${benefit.color} p-0.5`}
+                        className={`w-12 h-12 rounded-xl bg-gradient-to-br ${benefit.color} p-0.5`}
                       >
                         <div className="w-full h-full bg-gray-950 rounded-[10px] flex items-center justify-center group-hover:bg-gray-900/50 transition-colors">
-                          <Icon className="w-7 h-7 text-white fill-white/20" />
+                          <Icon className="w-6 h-6 text-white" />
                         </div>
                       </div>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary-100 transition-colors">
+                    <h3 className="text-lg font-bold text-white mb-2 group-hover:text-emerald-100 transition-colors">
                       {benefit.title}
                     </h3>
 
@@ -120,7 +115,7 @@ export default function FarmerBenefitsSection() {
                     </p>
 
                     {/* Arrow indicator */}
-                    <div className="mt-6 flex items-center text-primary-400 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="mt-5 flex items-center text-emerald-400 text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity">
                       <span>Learn more</span>
                       <svg
                         className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform"

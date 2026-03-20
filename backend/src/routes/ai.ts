@@ -1,136 +1,93 @@
 import { Router } from 'express';
+import axios from 'axios';
 
 const router = Router();
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000/api';
 
-// AI Price Suggestion
-router.post('/price-suggestion', (req, res) => {
-  const { category, location, season, quality, competitorPrices } = req.body;
+// Helper to handle AI service proxying
+const proxyToAI = async (req: any, res: any, path: string, method: 'get' | 'post' = 'get') => {
+  try {
+    const url = `${AI_SERVICE_URL}${path}`;
+    const response = method === 'get' 
+      ? await axios.get(url, { params: req.query })
+      : await axios.post(url, req.body);
+    
+    res.json(response.data);
+  } catch (error: any) {
+    console.error(`AI Service Error (${path}):`, error.message);
+    res.status(error.response?.status || 500).json({
+      error: 'AI Service Error',
+      message: error.message
+    });
+  }
+};
 
-  // Simulated AI price calculation
-  let basePrice = 5;
+// Legacy Simulated Routes (Kept for compatibility, but could be proxied)
+router.post('/price-suggestion', (req, res) => proxyToAI(req, res, '/price-suggestion', 'post'));
+router.post('/supplier-recommendation', (req, res) => proxyToAI(req, res, '/supplier-recommendation', 'post'));
+router.get('/quality-grade/:productId', (req, res) => proxyToAI(req, res, `/quality-grade/${req.params.productId}`));
+router.get('/demand-forecast/:category', (req, res) => proxyToAI(req, res, `/demand-forecast/${req.params.category}`));
 
-  // Adjust based on category
-  const categoryMultipliers: Record<string, number> = {
-    Vegetables: 1,
-    Fruits: 1.5,
-    Grains: 0.8,
-    Spices: 2,
-    Dairy: 1.3,
-    Organic: 1.5,
-  };
+// --- Strategic Analytics Routes ---
 
-  basePrice *= categoryMultipliers[category] || 1;
+// 1. Revenue & Financial Analytics
+router.get('/analytics/revenue/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/revenue-metrics/${req.params.farmerId}`));
 
-  // Adjust for quality (1-100)
-  basePrice *= (quality / 100) * 0.5 + 0.75;
+// 2. Spend & Profitability Intelligence
+router.get('/analytics/profitability/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/profitability/${req.params.farmerId}`));
 
-  // Season adjustment
-  if (season === 'peak') basePrice *= 0.8;
-  if (season === 'off-peak') basePrice *= 1.3;
+// 3. Predictive Revenue Forecasting
+router.get('/analytics/revenue-forecast/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/revenue-forecast/${req.params.farmerId}`));
 
-  // Add some randomness to simulate ML model
-  const noise = (Math.random() - 0.5) * 0.2;
-  const suggestedPrice = Math.round(basePrice * (1 + noise) * 100) / 100;
+// 4. Buyer Sentiment & Market Pull
+router.get('/analytics/buyer-sentiment/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/buyer-sentiment/${req.params.farmerId}`));
 
-  res.json({
-    suggestedPrice,
-    confidence: 0.85,
-    factors: [
-      'Market demand analysis',
-      'Seasonal trends',
-      'Quality assessment',
-      'Competitor pricing',
-    ],
-  });
-});
+// 5. Tender & RFQ Win-Loss Analytics
+router.get('/analytics/tender-insights/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/tender-insights/${req.params.farmerId}`));
 
-// Supplier Recommendation
-router.post('/supplier-recommendation', (req, res) => {
-  const { buyerId, requirements } = req.body;
+// 6. Order Fulfillment & Operational Health
+router.get('/analytics/fulfillment-health/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/fulfillment-health/${req.params.farmerId}`));
 
-  // Simulated recommendation engine
-  const suppliers = [
-    {
-      id: '1',
-      name: 'Rajesh Organic Farms',
-      rating: 4.8,
-      products: 45,
-      location: 'Maharashtra',
-      matchScore: 95,
-      certifications: ['Organic', 'GAP'],
-    },
-    {
-      id: '2',
-      name: 'Green Valley Agri',
-      rating: 4.6,
-      products: 32,
-      location: 'Gujarat',
-      matchScore: 88,
-      certifications: ['Organic'],
-    },
-    {
-      id: '3',
-      name: 'Farm Fresh Co.',
-      rating: 4.9,
-      products: 58,
-      location: 'Karnataka',
-      matchScore: 82,
-      certifications: ['GAP', 'Export Quality'],
-    },
-  ];
+// 7. AI Inventory & Wastage Intelligence
+router.get('/analytics/inventory-intelligence/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/inventory-intelligence/${req.params.farmerId}`));
 
-  res.json({
-    recommendations: suppliers,
-    totalMatched: suppliers.length,
-  });
-});
+// 8. Logistics & Supply Chain Optimization
+router.get('/analytics/logistics-efficiency/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/logistics-efficiency/${req.params.farmerId}`));
 
-// Quality Grade
-router.get('/quality-grade/:productId', (req, res) => {
-  // Simulated AI quality grading
-  const grades = {
-    A: 90,
-    B: 75,
-    C: 60,
-  };
+// 9. Strategic Growth Scorecard
+router.get('/analytics/growth-index/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/growth-index/${req.params.farmerId}`));
 
-  const grade = 'A';
-  const score = grades[grade as keyof typeof grades];
+// 10. Dynamic Market Benchmarking
+router.get('/analytics/market-benchmarking/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/market-benchmarking/${req.params.farmerId}`));
 
-  res.json({
-    productId: req.params.productId,
-    grade,
-    score,
-    factors: {
-      freshness: 95,
-      appearance: 90,
-      size: 88,
-      color: 92,
-    },
-    confidence: 0.92,
-  });
-});
+// 11. Precision Expansion Opportunities
+router.get('/analytics/expansion-opportunities/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/expansion-opportunities/${req.params.farmerId}`));
 
-// Demand Forecast
-router.get('/demand-forecast/:category', (req, res) => {
-  const { category } = req.params;
+// 12. Multi-Hazard Risk Intelligence
+router.get('/analytics/risk-profile/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/risk-profile/${req.params.farmerId}`));
 
-  // Simulated demand forecast
-  const forecast = [
-    { month: 'Jan', demand: 100, price: 5.2 },
-    { month: 'Feb', demand: 110, price: 5.5 },
-    { month: 'Mar', demand: 130, price: 5.8 },
-    { month: 'Apr', demand: 150, price: 6.2 },
-    { month: 'May', demand: 170, price: 6.5 },
-    { month: 'Jun', demand: 160, price: 6.0 },
-  ];
+// 13. Digital Compliance & Quality Compliance Score
+router.get('/analytics/compliance-checker/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/compliance-checker/${req.params.farmerId}`));
 
-  res.json({
-    category,
-    forecast,
-    trend: 'increasing',
-    insight: `${category} demand is expected to increase by 20% over the next 3 months`,
-  });
-});
+// 14. Platform Digital Adoption Index
+router.get('/analytics/digital-footprint/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/digital-footprint/${req.params.farmerId}`));
+
+// 15. Sustainable Farming & ESG Impact
+router.get('/analytics/sustainability-score/:farmerId', (req, res) => 
+  proxyToAI(req, res, `/analytics/sustainability-score/${req.params.farmerId}`));
 
 export default router;

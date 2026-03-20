@@ -2,15 +2,24 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Image as ImageIcon, Mic, MoreVertical, Check, CheckCheck, Sparkles, Handshake, X, ThumbsUp } from 'lucide-react';
+import { 
+  Send, Image as ImageIcon, Mic, MoreVertical, 
+  Check, CheckCheck, Sparkles, Handshake, X, 
+  ThumbsUp, FileText, Globe, Zap, ShieldCheck,
+  Target, AlertCircle, Search, Filter, Paperclip,
+  Download, ExternalLink, MessageSquare, Scale,
+  Languages, History, Info, ArrowLeftRight, Clock,
+  ArrowLeft
+} from 'lucide-react';
 import { useAdvancedChat, ChatMessage } from '@/hooks/useAdvancedChat';
 import { messagesApi } from '@/lib/api';
 import { useAuthZustand } from '@/store/authZustand';
+import toast from 'react-hot-toast';
 
 interface ChatRoomProps {
-  conversationId: string;
-  recipientId: string;
-  recipientName: string;
+  conversationId?: string;
+  recipientId?: string;
+  recipientName?: string;
 }
 
 export default function ChatRoom({ 
@@ -19,12 +28,15 @@ export default function ChatRoom({
   recipientName: initialRecipientName 
 }: ChatRoomProps) {
   const { user } = useAuthZustand();
-  const [selectedConv, setSelectedConv] = useState({ 
+  const [selectedConv, setSelectedConv] = useState<{id?: string, recipientId?: string, name?: string}>({ 
     id: initialConvId, 
     recipientId: initialRecipientId, 
     name: initialRecipientName 
   });
   const [conversations, setConversations] = useState<any[]>([]);
+  const [showNegotiation, setShowNegotiation] = useState(false);
+  const [translateMode, setTranslateMode] = useState(false);
+  const [offerPrice, setOfferPrice] = useState('32.50');
   
   const { 
     messages, 
@@ -33,7 +45,7 @@ export default function ChatRoom({
     isTyping, 
     onlineStatus, 
     lastSeen 
-  } = useAdvancedChat(selectedConv.id, selectedConv.recipientId);
+  } = useAdvancedChat(selectedConv.id ?? null, selectedConv.recipientId ?? null);
   
   const [input, setInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -43,16 +55,14 @@ export default function ChatRoom({
       try {
         const { data } = await messagesApi.getConversations();
         setConversations(data || []);
-        if (data && data.length > 0 && selectedConv.id === 'demo-conv-id') {
+        if (data && data.length > 0 && (!selectedConv.id || selectedConv.id === 'demo-conv-id')) {
           const first = data[0];
           const recId = first.participants.find((p: string) => p !== user?.id);
-          setSelectedConv({ id: first.id, recipientId: recId, name: 'Customer' });
+          setSelectedConv({ id: first.id, recipientId: recId, name: first.recipientName || 'Nexus Node' });
         }
-      } catch (e) {
-        console.error('Failed to load conversations:', e);
-      }
+      } catch (e) { /* ignored */ }
     })();
-  }, [user?.id]);
+  }, [user?.id, selectedConv.id]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -70,214 +80,212 @@ export default function ChatRoom({
     sendTyping(false);
   };
 
+  const handleNegotiation = () => {
+    const msg = `⚡ FORMAL COUNTER-OFFER: Proposed price ₹${offerPrice}/kg for Lot #ODX-21. Terms: 30% advance, 70% delivery.`;
+    sendMessage(msg);
+    setShowNegotiation(false);
+    toast.success('Negotiation payload broadcasted');
+  };
+
   return (
-    <div className="flex flex-col lg:flex-row h-[700px] glass-card border border-white/20 rounded-3xl overflow-hidden bg-white/5 backdrop-blur-xl shadow-2xl">
-      {/* Sidebar - Conversation List */}
-      <div className="w-full lg:w-80 border-r border-white/10 flex flex-col bg-white/5">
+    <div className="flex h-full bg-white/5 backdrop-blur-3xl relative overflow-hidden">
+      
+      {/* Sidebar - Compact */}
+      <div className={`flex flex-col border-r border-white/10 bg-white/5 transition-all duration-500 ${selectedConv.id ? 'hidden lg:flex w-80' : 'w-full'}`}>
         <div className="p-6 border-b border-white/10">
-          <h2 className="text-xl font-display font-black text-gray-900 dark:text-white flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary-500" />
-            Chats
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+             <h2 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
+               <MessageSquare className="w-4 h-4 text-indigo-500" /> Channels
+             </h2>
+             <button className="h-8 w-8 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-all border border-white/10"><Filter size={14} /></button>
+          </div>
+          <div className="relative group">
+             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={14} />
+             <input type="text" placeholder="Scan Nodes..." className="w-full h-10 pl-10 pr-4 bg-white/5 rounded-xl border border-white/10 outline-none focus:ring-1 focus:ring-indigo-500/50 text-[10px] uppercase font-black tracking-widest transition-all" />
+          </div>
         </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar">
-          {conversations.length > 0 ? (
-            conversations.map((conv) => {
-              const recId = conv.participants.find((p: string) => p !== user?.id);
-              const isActive = selectedConv.id === conv.id;
-              return (
-                <button
-                  key={conv.id}
-                  onClick={() => setSelectedConv({ id: conv.id, recipientId: recId, name: 'Customer' })}
-                  className={`w-full p-4 rounded-2xl flex items-center gap-3 transition-all duration-300 ${
-                    isActive 
-                      ? 'bg-primary-600/20 border border-primary-500/30 text-primary-300' 
-                      : 'hover:bg-white/5 text-gray-400 border border-transparent'
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${isActive ? 'bg-primary-500 text-white' : 'bg-white/10'}`}>
-                    C
-                  </div>
-                  <div className="text-left flex-1 min-w-0">
-                    <p className={`font-bold truncate ${isActive ? 'text-white' : 'text-gray-300'}`}>Customer</p>
-                    <p className="text-xs truncate opacity-60">{conv.lastMessage || 'No messages'}</p>
-                  </div>
-                </button>
-              );
-            })
-          ) : (
-            <div className="text-center py-10 px-4">
-              <p className="text-sm text-gray-500 opacity-60">No active conversations yet.</p>
-            </div>
+
+        <div className="flex-1 overflow-y-auto p-3 space-y-2 no-scrollbar">
+          {conversations.map((conv) => {
+            const recId = conv.participants.find((p: string) => p !== user?.id);
+            const isActive = selectedConv.id === conv.id;
+            const recName = conv.recipientName || 'Nexus Node';
+            return (
+              <button
+                key={conv.id}
+                onClick={() => setSelectedConv({ id: conv.id, recipientId: recId, name: recName })}
+                className={`w-full p-3 rounded-2xl flex items-center gap-3 transition-all duration-300 ${
+                  isActive ? 'bg-indigo-600 text-white shadow-lg' : 'hover:bg-white/10 text-gray-500'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm ${isActive ? 'bg-white/20' : 'bg-indigo-500/10 text-indigo-500'}`}>
+                  {recName.charAt(0)}
+                </div>
+                <div className="flex-1 text-left min-w-0 pr-2">
+                  <p className="font-bold text-[11px] uppercase tracking-tight truncate pb-0.5">{recName}</p>
+                  <p className="text-[8px] font-black uppercase tracking-widest opacity-60 truncate">Active Node</p>
+                </div>
+                {isActive && <div className="w-1 h-1 rounded-full bg-white animate-pulse" />}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Main Workspace */}
+      <div className={`flex-1 flex flex-col bg-white/5 relative h-full min-h-0 ${!selectedConv.id ? 'hidden lg:flex' : 'flex'}`}>
+        
+        {/* Compact Header */}
+        <div className="px-6 py-3 border-b border-white/10 bg-white/5 backdrop-blur-2xl flex items-center justify-between shrink-0">
+           <div className="flex items-center gap-4">
+              <button onClick={() => setSelectedConv({})} className="lg:hidden p-2 text-gray-500 hover:text-indigo-500 transition-colors"><ArrowLeft size={20} /></button>
+              <div className="relative">
+                 <div className="w-10 h-10 rounded-xl bg-indigo-500 text-white flex items-center justify-center font-black text-lg">
+                    {selectedConv.name?.charAt(0)}
+                 </div>
+                 <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white dark:border-[#0f172a] ${onlineStatus ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+              </div>
+              <div>
+                 <h3 className="text-sm font-black uppercase tracking-tight text-gray-900 dark:text-white leading-none mb-1">{selectedConv.name}</h3>
+                 <div className="flex items-center gap-2">
+                    <p className="text-[7px] font-black text-indigo-500 uppercase tracking-widest flex items-center gap-1"><Target size={8} /> RFQ: ODX-422</p>
+                 </div>
+              </div>
+           </div>
+           
+           <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setTranslateMode(!translateMode)}
+                className={`h-8 px-3 rounded-lg border flex items-center gap-1.5 text-[8px] font-black uppercase tracking-widest transition-all ${translateMode ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white/5 border-white/10 text-gray-500 hover:text-indigo-500'}`}
+              >
+                 <Languages size={12} /> AI Translate
+              </button>
+              <button onClick={() => setShowNegotiation(!showNegotiation)} className="h-8 px-4 bg-black text-white rounded-lg text-[8px] font-black uppercase tracking-widest flex items-center gap-1.5 hover:scale-105 transition-all">
+                 <Handshake size={12} /> Negotiate
+              </button>
+              <button className="h-8 w-8 flex items-center justify-center rounded-lg border border-white/10 text-gray-400"><MoreVertical size={14} /></button>
+           </div>
+        </div>
+
+        {/* Message Feed - Optimized */}
+        <div 
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar"
+        >
+          {messages.map((msg, idx) => {
+            const isMe = msg.senderId === user?.id;
+            const isNegotiation = msg.content.includes('COUNTER-OFFER');
+            return (
+              <div key={msg.id || idx} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[75%] space-y-1 ${isMe ? 'items-end' : 'items-start'} flex flex-col`}>
+                   <div className={`px-5 py-3 rounded-2xl text-[13px] leading-snug ${
+                     isMe 
+                       ? 'bg-indigo-600 text-white rounded-tr-none' 
+                       : (isNegotiation ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 dark:text-emerald-100 rounded-tl-none' : 'bg-white dark:bg-white/10 border border-white/10 text-gray-900 dark:text-white rounded-tl-none shadow-sm')
+                   }`}>
+                      <p className="font-bold">{translateMode && !isMe ? `[Translated]: ${msg.content}` : msg.content}</p>
+                      
+                      {isNegotiation && (
+                         <div className="mt-3 p-3 bg-emerald-500/20 rounded-xl border border-emerald-500/20 flex items-center justify-between gap-4">
+                            <div className="flex items-center gap-2">
+                               <Scale size={14} className="text-emerald-500" />
+                               <p className="text-[11px] font-black tracking-tighter">₹{offerPrice}/kg</p>
+                            </div>
+                            <button className="h-7 px-3 bg-emerald-500 text-white rounded-lg text-[8px] font-black uppercase tracking-widest">Accept</button>
+                         </div>
+                      )}
+                   </div>
+                   <div className="flex items-center gap-2 px-1">
+                       <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                       {isMe && <CheckCheck size={10} className="text-indigo-400" />}
+                   </div>
+                </div>
+              </div>
+            );
+          })}
+          {isTyping && (
+             <div className="flex justify-start">
+                <div className="bg-white/10 px-3 py-2 rounded-xl flex gap-1 items-center">
+                   {[0, 1, 2].map(i => <div key={i} className="w-1 h-1 rounded-full bg-indigo-500 animate-pulse" />)}
+                </div>
+             </div>
           )}
         </div>
-      </div>
 
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0 relative">
-        {/* Header */}
-        <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/10 backdrop-blur-md z-10">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-500/20 flex items-center justify-center border border-primary-500/30">
-              <span className="text-primary-700 font-bold">{selectedConv.name[0]}</span>
-            </div>
-            <div>
-              <h3 className="font-display font-bold text-gray-900 dark:text-white leading-tight">{selectedConv.name}</h3>
-              <p className="text-xs text-gray-500">
-                {onlineStatus === 'online' ? (
-                  <span className="text-green-500 flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" /> online
-                  </span>
-                ) : (
-                  `last seen ${lastSeen ? new Date(lastSeen).toLocaleTimeString() : 'recently'}`
-                )}
-              </p>
-            </div>
-          </div>
-          <button className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
-            <MoreVertical className="w-5 h-5" />
-          </button>
-        </div>
-
-        {/* Messages area */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar bg-white/5 bg-opacity-30 relative">
-          {/* Subtle Wallpaper Overlay */}
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat" />
-          
-          <div className="relative z-10 space-y-4">
-            {messages.map((msg, idx) => {
-              const isMe = msg.senderId === user?.id;
-              const isNegotiation = msg.type === 'negotiation';
-
-              return (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  key={msg.id || idx}
-                  className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`max-w-[85%] sm:max-w-[70%] group`}>
-                    {isNegotiation ? (
-                      <div className={`p-4 rounded-3xl border shadow-2xl backdrop-blur-md ${isMe ? 'bg-primary-900/60 border-primary-500/50 text-white' : 'bg-white/10 border-white/20 text-gray-100'}`}>
-                        <div className="flex items-center gap-2 mb-3">
-                          <Handshake className="w-5 h-5 text-yellow-500" />
-                          <span className="font-display font-bold uppercase tracking-wider text-[10px] opacity-70">Price Negotiation</span>
-                        </div>
-                        <div className="bg-black/30 rounded-2xl p-4 mb-4 text-center border border-white/5">
-                          <p className="text-[10px] text-gray-400 mb-1">Proposed Price</p>
-                          <p className="text-3xl font-display font-black text-primary-400">₹{msg.negotiationData?.price}</p>
-                        </div>
-                        {!isMe && msg.negotiationData?.status === 'pending' && (
-                          <div className="flex gap-2">
-                            <button className="flex-1 bg-green-600 hover:bg-green-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-1.5">
-                              <ThumbsUp className="w-4 h-4" /> Accept
-                            </button>
-                            <button className="flex-1 bg-red-600/80 hover:bg-red-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg active:scale-95 flex items-center justify-center gap-1.5">
-                              <X className="w-4 h-4" /> Reject
-                            </button>
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between mt-3 opacity-60">
-                          <span className="text-[9px]">{new Date(msg.createdAt).toLocaleTimeString()}</span>
-                          <span className="text-[9px] uppercase font-black tracking-widest text-primary-400">{msg.negotiationData?.status}</span>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className={`
-                        px-5 py-3 rounded-2xl text-sm shadow-xl border relative transition-all duration-300
-                        ${isMe 
-                          ? 'bg-gradient-to-br from-primary-600 to-primary-800 text-white border-primary-500/30 rounded-tr-none' 
-                          : 'bg-white/10 dark:bg-white/5 text-gray-100 border-white/10 rounded-tl-none backdrop-blur-xl'}
-                      `}>
-                        <p className="leading-relaxed break-words">{msg.content}</p>
-                        <div className="flex items-center justify-end gap-1.5 mt-2 opacity-60">
-                          <span className="text-[9px] tracking-tight">
-                            {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                          {isMe && (
-                            <span>
-                              {msg.status === 'seen' ? <CheckCheck className="w-3.5 h-3.5 text-sky-300" /> : 
-                               msg.status === 'delivered' ? <CheckCheck className="w-3.5 h-3.5" /> : 
-                               <Check className="w-3.5 h-3.5" />}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
-            
-            {isTyping && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                <div className="bg-white/10 backdrop-blur-md px-4 py-3 rounded-2xl rounded-tl-none border border-white/5 shadow-lg">
-                  <div className="flex gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-primary-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                    <span className="w-1.5 h-1.5 bg-primary-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                    <span className="w-1.5 h-1.5 bg-primary-400 rounded-full animate-bounce" />
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </div>
-        </div>
-
-        {/* Action Bar (Smart Replies) */}
-        <div className="p-2 px-4 bg-transparent">
-          <AnimatePresence>
-            {!input.trim() && !isTyping && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="flex gap-2 overflow-x-auto no-scrollbar pb-2 pt-1"
+        {/* Input Area - Compact */}
+        <div className="p-4 border-t border-white/10 bg-white/5 shrink-0">
+           <div className="flex items-center gap-3 bg-white/10 rounded-2xl border border-white/10 p-2 shadow-inner group">
+              <button className="h-9 w-9 flex items-center justify-center rounded-xl hover:bg-white/10 text-gray-500 transition-all"><Paperclip size={16} /></button>
+              <input 
+                type="text" 
+                placeholder="Secure message..." 
+                className="flex-1 bg-transparent border-none outline-none text-[13px] font-bold text-gray-900 dark:text-white"
+                value={input}
+                onChange={(e) => { setInput(e.target.value); sendTyping(true); }}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              />
+              <button 
+                onClick={handleSend}
+                disabled={!input.trim()}
+                className="h-9 px-5 bg-indigo-600 text-white rounded-xl text-[9px] font-black uppercase tracking-widest disabled:opacity-40 transition-all shadow-lg shadow-indigo-600/20"
               >
-                {["Is this available?", "Price negotiable?", "How's the quality?", "Expected delivery?"].map((suggest) => (
-                  <button
-                    key={suggest}
-                    onClick={() => { setInput(suggest); handleSend(); }}
-                    className="shrink-0 px-4 py-2 rounded-full bg-black/40 backdrop-blur-xl border border-white/10 text-xs text-white hover:bg-primary-600/40 hover:border-primary-500/50 transition-all shadow-2xl flex items-center gap-2"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-yellow-400" />
-                    {suggest}
-                  </button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
+                 Send
+              </button>
+           </div>
+           <p className="text-[7px] font-black text-gray-500 uppercase tracking-[0.3em] mt-3 text-center opacity-40">RSA-2048 Encrypted Node-to-Node Stream</p>
         </div>
 
-        {/* Input area */}
-        <div className="p-4 bg-black/20 backdrop-blur-2xl border-t border-white/10">
-          <div className="flex items-center gap-3 bg-white/5 rounded-3xl p-2 pl-4 border border-white/10 shadow-inner">
-            <button className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
-              <ImageIcon className="w-5 h-5" />
-            </button>
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-                sendTyping(true);
-              }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="Type a message..."
-              className="flex-1 bg-transparent border-none focus:ring-0 text-sm text-white placeholder-gray-500 py-2"
-            />
-            <button className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
-              <Mic className="w-5 h-5" />
-            </button>
-            <button 
-              disabled={!input.trim()}
-              onClick={handleSend}
-              className={`p-3 rounded-2xl transition-all shadow-2xl active:scale-95 ${input.trim() ? 'bg-primary-600 text-white' : 'bg-white/5 text-gray-600 cursor-not-allowed'}`}
-            >
-              <Send className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
+        {/* Negotiate Modal */}
+        <AnimatePresence>
+           {showNegotiation && (
+              <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-xl flex items-center justify-center p-6 text-white">
+                 <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full max-w-xs bg-gray-900 border border-white/20 rounded-[32px] p-8 shadow-2xl space-y-6">
+                    <div className="flex justify-between items-center">
+                       <h3 className="text-xl font-display font-black uppercase tracking-tight italic">Delta Offer</h3>
+                       <button onClick={() => setShowNegotiation(false)} className="h-8 w-8 bg-white/10 rounded-full flex items-center justify-center"><X size={16} /></button>
+                    </div>
+                    <div className="space-y-4">
+                       <div className="bg-white/5 p-4 rounded-2xl border border-white/10">
+                          <label className="text-[8px] font-black text-gray-500 uppercase tracking-widest block mb-2">New Unit Bid (₹)</label>
+                          <input type="text" value={offerPrice} onChange={(e) => setOfferPrice(e.target.value)} className="bg-transparent border-none text-3xl font-display font-black text-indigo-500 outline-none w-full" />
+                       </div>
+                       <button onClick={handleNegotiation} className="w-full h-12 bg-indigo-600 rounded-2xl text-[9px] font-black uppercase tracking-widest shadow-xl shadow-indigo-600/20">Broadcast Offer</button>
+                    </div>
+                 </motion.div>
+              </div>
+           )}
+        </AnimatePresence>
       </div>
+
+      {/* Right Snapshot - Slim */}
+      <div className="hidden xl:flex w-72 border-l border-white/10 flex-col p-6 space-y-8 bg-white/5">
+          <div className="space-y-4">
+             <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Delta Analysis</h4>
+             <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                <p className="text-[8px] font-black text-indigo-400 uppercase tracking-widest mb-1">Response Speed</p>
+                <p className="text-sm font-display font-black uppercase">~ 4 MIN</p>
+             </div>
+             <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                <p className="text-[8px] font-black text-emerald-400 uppercase tracking-widest mb-1">Contract Odds</p>
+                <p className="text-sm font-display font-black uppercase">96% SUCCESS</p>
+             </div>
+          </div>
+          <div className="space-y-4">
+             <h4 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Evidence Vault</h4>
+             <div className="space-y-2">
+                {['Quote_ODX.pdf', 'Lab_Report.jpg'].map((d, i) => (
+                   <div key={i} className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-indigo-500/30 transition-all cursor-pointer">
+                      <div className="flex items-center gap-2 min-w-0">
+                         <FileText size={14} className="text-indigo-500" />
+                         <p className="text-[9px] font-black uppercase truncate">{d}</p>
+                      </div>
+                      <Download size={12} className="text-gray-500" />
+                   </div>
+                ))}
+             </div>
+          </div>
+      </div>
+
     </div>
   );
 }

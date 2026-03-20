@@ -46,11 +46,11 @@ const showcaseProducts = [
 
 export default function ProductShowcaseSection() {
   return (
-    <section id="products" className="py-24 sm:py-32 bg-gray-950 relative overflow-hidden">
+    <section id="products" className="section-padding bg-gray-950 relative overflow-hidden">
       <Container className="relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
           <div className="max-w-2xl">
-            <motion.h2 
+            <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-100px' }}
@@ -59,17 +59,17 @@ export default function ProductShowcaseSection() {
             >
               Direct from the source
             </motion.h2>
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-100px' }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="mt-6 text-gray-400 text-lg sm:text-xl font-light"
+              className="mt-4 text-gray-400 text-base sm:text-lg font-light leading-relaxed"
             >
               Sample our marketplace. Every batch is graded by AI and tracked on-chain for complete transparency.
             </motion.p>
           </div>
-          
+
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -87,7 +87,7 @@ export default function ProductShowcaseSection() {
           </motion.div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
           {showcaseProducts.map((p, idx) => (
             <motion.div
               key={p.id}
@@ -95,42 +95,50 @@ export default function ProductShowcaseSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.5, delay: idx * 0.1 }}
-              whileHover={{ y: -8 }}
-              className="group relative bg-white/[0.02] border border-white/10 rounded-3xl overflow-hidden hover:bg-white/[0.04] transition-colors duration-300"
+              whileHover={{ y: -6 }}
+              className="group relative bg-white/[0.02] border border-white/[0.08] rounded-2xl overflow-hidden hover:bg-white/[0.04] hover:border-white/15 transition-all duration-300"
             >
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-80 z-10" />
-              
+
               <div className="relative aspect-[4/3] overflow-hidden">
-                <img 
-                  src={p.image} 
-                  alt={p.name} 
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                 />
-                
+
                 {/* Quality Badge */}
-                <div className="absolute top-4 left-4 z-20 flex items-center gap-1.5 bg-gray-950/80 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full shadow-lg">
-                  <ShieldCheck className="w-3.5 h-3.5 text-primary-400" />
+                <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 bg-gray-950/80 backdrop-blur-md border border-white/10 px-3 py-1.5 rounded-full shadow-lg">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                   <span className="text-xs font-bold text-white tracking-wide uppercase">{p.quality}</span>
+                </div>
+
+                {/* Hover overlay */}
+                <div className="absolute inset-0 z-20 bg-emerald-600/0 group-hover:bg-emerald-600/10 transition-colors duration-300 flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-white/20">
+                    View Details
+                  </span>
                 </div>
               </div>
 
-              <div className="relative z-20 p-6 flex flex-col gap-3">
+              <div className="relative z-20 p-5 flex flex-col gap-2.5">
                 <div className="flex items-center gap-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  <Leaf className="w-3 h-3 text-primary-500" />
+                  <Leaf className="w-3 h-3 text-emerald-500" />
                   {p.category}
                 </div>
-                
-                <h3 className="text-lg font-display font-semibold text-white tracking-tight leading-snug">
+
+                <h3 className="text-base font-display font-semibold text-white tracking-tight leading-snug">
                   {p.name}
                 </h3>
-                
+
                 <p className="text-sm text-gray-500 font-light truncate">
                   By {p.farmer}
                 </p>
 
-                <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-4">
-                  <span className="text-primary-400 font-bold text-xl tracking-tight flex items-center gap-1.5">
-                    <Tag className="w-4 h-4 text-primary-500/70" />
+                <div className="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
+                  <span className="text-emerald-400 font-bold text-lg tracking-tight flex items-center gap-1.5">
+                    <Tag className="w-4 h-4 text-emerald-500/70" />
                     {p.price}
                   </span>
                 </div>

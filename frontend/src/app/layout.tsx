@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const jakarta = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-jakarta' });
 
 export const metadata: Metadata = {
-  title: 'ODOP Connect - AI-Powered Agricultural Marketplace',
+  title: 'ODOP Connect -Agricultural Marketplace',
   description: 'Connect farmers directly with buyers. Eliminate middlemen with blockchain traceability and AI-powered pricing.',
   keywords: ['agriculture', 'marketplace', 'farmers', 'buyers', 'blockchain', 'AI'],
 };
