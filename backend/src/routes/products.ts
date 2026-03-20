@@ -206,6 +206,21 @@ router.get('/:id', async (req: Request, res: Response) => {
   }
 });
 
+// Increment views (Atomic update)
+router.post('/:id/view', async (req: Request, res: Response) => {
+  try {
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      { $inc: { views: 1 } },
+      { new: true }
+    );
+    if (!product) return res.status(404).json({ error: 'Product not found' });
+    res.json({ views: product.views });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ==========================================
 // PROTECTED FARMER ROUTES (CRUD)
 // ==========================================

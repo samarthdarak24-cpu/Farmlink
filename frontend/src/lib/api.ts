@@ -103,6 +103,7 @@ export const paymentsApi = {
 
 // Supplier Ratings API
 export const supplierRatingsApi = {
+  getFarmerStats: () => api.get('/suppliers/farmer/stats'),
   summary: (farmerId: string) => api.get(`/suppliers/${farmerId}/ratings/summary`),
   getAll: (farmerId: string) => api.get(`/suppliers/${farmerId}/ratings`),
 };
@@ -148,10 +149,12 @@ export const buyerCartApi = {
 export const messagesApi = {
   getConversations: () => api.get('/messages/conversations'),
   getMessages: (conversationId: string) => api.get(`/messages/${conversationId}`),
-  sendMessage: (conversationId: string, content: string) =>
-    api.post(`/messages/${conversationId}`, { content }),
+  sendMessage: (conversationId: string, payload: any) =>
+    api.post(`/messages/${conversationId}`, payload),
   startConversation: (userId: string, initialMessage: string) =>
     api.post('/messages/start', { userId, initialMessage }),
+  search: (query: string) => api.get('/messages/search', { params: { q: query } }),
+  markAsRead: (messageId: string) => api.put(`/messages/${messageId}/read`),
 };
 
 // AI API
@@ -159,6 +162,7 @@ export const aiApi = {
   getPriceSuggestion: (productData: any) => api.post('/ai/price-suggestion', productData),
   getSupplierRecommendation: (buyerId: string, requirements: any) =>
     api.post('/ai/supplier-recommendation', { buyerId, requirements }),
+  getBuyerRecommendations: (payload: any) => api.post('/ai/buyer-recommendation', payload),
   getQualityGrade: (productId: string) => api.get(`/ai/quality-grade/${productId}`),
   getDemandForecast: (productCategory: string) => api.get(`/ai/demand-forecast/${productCategory}`),
 };

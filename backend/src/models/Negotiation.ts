@@ -22,6 +22,7 @@ export interface INegotiation extends Document {
   quantity: number;
   offers: INegotiationOffer[];
   aiSuggestedPrice?: number;
+  expiresAt: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,6 +53,7 @@ const negotiationSchema = new Schema<INegotiation>(
     quantity: { type: Number, required: true },
     offers: [offerSchema],
     aiSuggestedPrice: { type: Number },
+    expiresAt: { type: Date, default: () => new Date(Date.now() + 24 * 60 * 60 * 1000) },
   },
   {
     timestamps: true,

@@ -19,6 +19,9 @@ export interface IProduct extends Document {
   certifications?: string[];
   qualityGrade?: number;
   aiPriceSuggestion?: number;
+  views: number;
+  orderCount: number;
+  revenueGenerated: number;
 }
 
 const productSchema = new Schema<IProduct>(
@@ -41,6 +44,9 @@ const productSchema = new Schema<IProduct>(
     certifications: [{ type: String }],
     qualityGrade: { type: Number },
     aiPriceSuggestion: { type: Number },
+    views: { type: Number, default: 0 },
+    orderCount: { type: Number, default: 0 },
+    revenueGenerated: { type: Number, default: 0 },
   },
   {
     timestamps: true,

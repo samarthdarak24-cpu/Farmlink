@@ -41,7 +41,10 @@ export const useAdvancedChat = (conversationId: string | null, recipientId: stri
 
     socket.on('receive_message', (msg: ChatMessage) => {
       if (msg.conversationId === conversationId) {
-        setMessages((prev) => [...prev, msg]);
+        setMessages((prev) => {
+          if (prev.some(m => m.id === msg.id)) return prev;
+          return [...prev, msg];
+        });
         // Auto-emit seen if we are in this conversation
         socket.emit('message_seen', {
           messageId: msg.id,
@@ -75,6 +78,18 @@ export const useAdvancedChat = (conversationId: string | null, recipientId: stri
         if (data.lastSeen) setLastSeen(data.lastSeen);
       }
     });
+
+    // Fetch historical messages
+    if (conversationId) {
+        (async () => {
+            try {
+                const { data } = await messagesApi.getMessages(conversationId);
+                setMessages(data || []);
+            } catch (e) {
+                console.error('Failed to fetch historical messages:', e);
+            }
+        })();
+    }
 
     return () => {
       socket.disconnect();

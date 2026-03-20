@@ -23,6 +23,7 @@ import buyerCartRoutes from './routes/buyerCart';
 import logisticsRoutes from './routes/logistics';
 import samplesRoutes from './routes/samples';
 import tendersRoutes from './routes/tenders';
+import reviewRoutes from './routes/reviews';
 import path from 'path';
 import { connectDB } from './config/db';
 import { initializeRedis, pubClient } from './config/redis';
@@ -82,6 +83,7 @@ app.use('/api/buyer/cart', buyerCartRoutes);
 app.use('/api/logistics', logisticsRoutes);
 app.use('/api/samples', samplesRoutes);
 app.use('/api/tenders', tendersRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 

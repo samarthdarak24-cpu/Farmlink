@@ -5,33 +5,33 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Bell, User as UserIcon, ChevronLeft, ChevronRight,
   TrendingUp, Boxes, ShieldCheck, Mail, FileText, Search, Shield, Filter,
-  Package, CheckCircle, BarChart3, Truck, Globe, Target, Map
+  Package, CheckCircle, BarChart3, Truck, Globe, Target, Map, Settings, RefreshCw
 } from 'lucide-react';
 import { logout as reduxLogout } from '@/store/authSlice';
 import { useDispatch } from 'react-redux';
 import { useAuthZustand } from '@/store/authZustand';
 
 const farmerMenu = [
-  { name: 'Product CRUD', id: 'farmer-product-crud', icon: Boxes },
-  { name: 'Inventory Tracking', id: 'farmer-inventory', icon: Boxes },
-  { name: 'Order Management', id: 'farmer-orders', icon: Package },
-  { name: 'RFQ Management', id: 'farmer-rfqs', icon: FileText },
-  { name: 'Real-time Chat', id: 'farmer-chat', icon: Mail },
-  { name: 'AI Quality Grading', id: 'farmer-ai-quality', icon: Target },
-  { name: 'Buyer Recommendations', id: 'farmer-buyer-recommendations', icon: UserIcon },
-  { name: 'Price Negotiation', id: 'farmer-negotiation', icon: FileText },
-  { name: 'Contract Generation', id: 'farmer-contracts', icon: FileText },
-  { name: 'Blockchain Traceability', id: 'farmer-blockchain', icon: ShieldCheck },
-  { name: 'Ratings & Reviews', id: 'farmer-ratings', icon: CheckCircle },
-  { name: 'Profile & KYC', id: 'farmer-kyc', icon: Shield },
-  { name: 'Demand Forecasting', id: 'farmer-forecast', icon: BarChart3 },
-  { name: 'Logistics Suggestions', id: 'farmer-logistics', icon: Truck },
-  { name: 'Multi-language Toggle', id: 'farmer-language', icon: Globe },
-  { name: 'Offline Fallback', id: 'farmer-offline', icon: Globe },
-  { name: 'Tender Participation', id: 'farmer-tenders', icon: Search },
-  { name: 'Sample Requests', id: 'farmer-samples', icon: Package },
-  { name: 'Analytics Dashboard', id: 'farmer-analytics', icon: BarChart3 },
-  { name: 'Product Performance', id: 'farmer-performance', icon: Target },
+  { name: 'Dashboard Overview', id: 'farmer-overview', href: '/dashboard/farmer', icon: BarChart3 },
+  { name: 'Product Management', id: 'farmer-products', href: '/dashboard/products', icon: Boxes },
+  { name: 'Inventory Tracking', id: 'farmer-inventory', href: '/dashboard/inventory', icon: Boxes },
+  { name: 'Order Management', id: 'farmer-orders', href: '/dashboard/orders', icon: Package },
+  { name: 'RFQ Management', id: 'farmer-rfqs', href: '/dashboard/rfq', icon: FileText },
+  { name: 'Real-time Chat', id: 'farmer-chat', href: '/dashboard/chat', icon: Mail },
+  { name: 'AI Quality Grading', id: 'farmer-ai-quality', href: '/dashboard/quality', icon: Target },
+  { name: 'Buyer Matchmaking', id: 'farmer-buyer-recommendations', href: '/dashboard/recommendations', icon: UserIcon },
+  { name: 'Price Negotiation', id: 'farmer-negotiation', href: '/dashboard/negotiation', icon: FileText },
+  { name: 'Legal Contracts', id: 'farmer-contracts', href: '/dashboard/contracts', icon: FileText },
+  { name: 'Blockchain Trust', id: 'farmer-blockchain', href: '/dashboard/blockchain', icon: ShieldCheck },
+  { name: 'Ratings & Reviews', id: 'farmer-ratings', href: '/dashboard/reviews', icon: CheckCircle },
+  { name: 'Profile & KYC', id: 'farmer-kyc', href: '/dashboard/profile', icon: Shield },
+  { name: 'Demand Forecast', id: 'farmer-forecast', href: '/dashboard/forecast', icon: BarChart3 },
+  { name: 'Supply Chain Logistics', id: 'farmer-logistics', href: '/dashboard/logistics', icon: Truck },
+  { name: 'Tender Hall', id: 'farmer-tenders', href: '/dashboard/tenders', icon: Search },
+  { name: 'Sample Requests', id: 'farmer-samples', href: '/dashboard/samples', icon: Package },
+  { name: 'Strategic Analytics', id: 'farmer-analytics', href: '/dashboard/analytics', icon: BarChart3 },
+  { name: 'Control Hub', id: 'farmer-settings', href: '/dashboard/settings', icon: Settings },
+  { name: 'Offline Sync Hub', id: 'farmer-sync', href: '/dashboard/sync', icon: RefreshCw },
 ];
 
 const buyerMenu = [
@@ -84,7 +84,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }, []);
 
   const roleFromUser = user?.role ?? null;
-  const roleFromPath = pathname.includes('farmer') ? 'farmer' : 'buyer';
+  const roleFromPath = pathname.includes('/dashboard/buyer') ? 'buyer' : 
+                       (pathname.includes('/dashboard/farmer') || 
+                        farmerMenu.some(m => m.href && pathname === m.href)) ? 'farmer' : 'buyer';
 
   const menuItems = useMemo(() => {
     const effectiveRole = roleFromUser ?? roleFromPath;
@@ -137,12 +139,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="flex-1 overflow-y-auto w-full py-2 space-y-1 custom-scrollbar">
           {menuItems.map((item, index) => {
             const Icon = item.icon;
-            const isActive = activeHash === `#${item.id}`;
+            // Support explicit href paths as well as hash-based routing
+            const href = (item as any).href || `#${item.id}`;
+            const isActive = (item as any).href ? pathname === (item as any).href : activeHash === `#${item.id}`;
 
             return (
               <a
                 key={index}
-                href={`#${item.id}`}
+                href={href}
                 className={`flex items-center w-full px-4 py-3 group relative ${
                   isActive
                     ? 'text-primary-600 bg-primary-50/50 dark:bg-primary-900/20 border-r-4 border-primary-600'
