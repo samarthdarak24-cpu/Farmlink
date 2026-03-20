@@ -1,9 +1,11 @@
+import mongoose from 'mongoose';
 import { Router, Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import jwt from 'jsonwebtoken';
 import Product from '../models/Product';
 import multer from 'multer';
 import { v2 as cloudinary } from 'cloudinary';
+import Order from '../models/Order';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'odop-connect-secret-key';
@@ -48,7 +50,7 @@ const verifyFarmer = (req: Request, res: Response, next: any) => {
 // Get all products with filters & pagination
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const { category, search, minPrice, maxPrice, location, page = 1, limit = 12 } = req.query;
+    const { category, search, minPrice, maxPrice, location, page = 1, limit = 12, sortBy = 'newest' } = req.query;
     
     const query: any = {};
 
@@ -78,16 +80,56 @@ router.get('/', async (req: Request, res: Response) => {
     const limitNum = Number(limit);
     const skip = (pageNum - 1) * limitNum;
 
+    const mongoSort: Record<string, 1 | -1> =
+      sortBy === 'price_asc' ? { price: 1 } : sortBy === 'price_desc' ? { price: -1 } : { createdAt: -1 };
+
     const [products, total] = await Promise.all([
-      Product.find(query).skip(skip).limit(limitNum).sort({ createdAt: -1 }),
-      Product.countDocuments(query)
+      Product.find(query).skip(skip).limit(limitNum).sort(mongoSort).lean(),
+      Product.countDocuments(query),
     ]);
+
+    // Attach farmer rating summary based on delivered orders.
+    const farmerIds = Array.from(new Set(products.map((p: any) => p.farmerId).filter(Boolean)));
+    const farmerObjectIds = farmerIds.map(id => new mongoose.Types.ObjectId(String(id)));
+
+    const ratingRows = farmerObjectIds.length
+      ? await Order.aggregate([
+          {
+            $match: {
+              farmerId: { $in: farmerObjectIds },
+              status: 'delivered',
+              rating: { $exists: true, $ne: null },
+            },
+          },
+          { $group: { _id: '$farmerId', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } },
+        ])
+      : [];
+    const ratingMap = new Map(ratingRows.map((r: any) => [String(r._id), { avg: r.avgRating, count: r.count }]));
+
+    let hydrated = products.map((p: any) => {
+      const r = ratingMap.get(String(p.farmerId));
+      return {
+        ...p,
+        farmerRatingAvg: r?.avg ?? null,
+        farmerRatingCount: r?.count ?? 0,
+      };
+    });
+
+    if (sortBy === 'rating_desc' || sortBy === 'rating_asc') {
+      const dir = sortBy === 'rating_asc' ? 1 : -1;
+      hydrated = hydrated.sort((a: any, b: any) => {
+        const av = a.farmerRatingAvg ?? -1;
+        const bv = b.farmerRatingAvg ?? -1;
+        if (bv === av) return 0;
+        return (av - bv) * dir;
+      });
+    }
 
     // Get 6 random for featured if we want to mimic previous behavior
     const featured = await Product.find().limit(6).sort({ qualityGrade: -1 });
 
     res.json({
-      products,
+      products: hydrated,
       pagination: {
         page: pageNum,
         limit: limitNum,
